@@ -16,7 +16,6 @@ public class NotasSalvas extends AppCompatActivity {
         setContentView(R.layout.activity_notas_salvas);
 
 
-
         // Recupera o componente de visualização (textViewListaNotas)
         TextView textViewListaNotas = findViewById(R.id.textViewListaNotas);
 
