@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         EditText nota1 = findViewById(R.id.nota1);
         EditText nota2 = findViewById(R.id.nota2);
         EditText nota3 = findViewById(R.id.nota3);
-        EditText resultado = findViewById(R.id.resultado);
 
         String name = nome.getText().toString();
         String grade1 = nota1.getText().toString();
@@ -90,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(name + "_nota3", grade3);
         editor.apply();
 
-        resultado.setText("Notas salvas para: " + name + "Nota 1 =" + grade1 + "Nota 2 =" + grade2 + "Nota 3 =" + grade3);
+        Toast.makeText(context, "Notas Salvas para: " + name, Toast.LENGTH_SHORT).show();
     }
 
     public void remover(View view) {
@@ -100,36 +99,32 @@ public class MainActivity extends AppCompatActivity {
 
         // Pega o texto digitado na barra de texto para buscar o aluno
         EditText editTextName = dialogView.findViewById(R.id.editTextName);
-        EditText resultado = findViewById(R.id.resultado);
 
         // Cria a tela de notificação para digitar o nome do aluno
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView)
-                .setTitle("Deletar Aluno")
                 .setPositiveButton("Deletar", new DialogInterface.OnClickListener() {
-
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         String alunoToDelete = editTextName.getText().toString();
 
-                        //Verificaando se o aluno existe e se existe remover suas notas
+                        // Verificaando se o aluno existe e se existe remover suas notas
                         if (sharedPrefs.contains(alunoToDelete + "_nota1")) {
                             SharedPreferences.Editor editor = sharedPrefs.edit();
                             editor.remove(alunoToDelete + "_nota1");
                             editor.remove(alunoToDelete + "_nota2");
                             editor.remove(alunoToDelete + "_nota3");
                             editor.apply();
-                            resultado.setText("Aluno Removido: " + alunoToDelete);
+                            Toast.makeText(context, "Aluno Removido: " + alunoToDelete, Toast.LENGTH_SHORT).show();
                         } else {
-                            resultado.setText("Aluno encontrado: " + alunoToDelete);
+                            Toast.makeText(context, "Aluno não encontrado: " + alunoToDelete, Toast.LENGTH_SHORT).show();
                         }
                     }
                 })
                 .setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //Apenas fecha o popUp
+                        // Apenas fecha o pop-up
                     }
                 });
 
@@ -138,99 +133,9 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+
     public void verNotas(View view) {
         Intent intent = new Intent(this, NotasSalvas.class);
         startActivity(intent);
-    }
-
-    private void createFile(String filename, String content) {
-
-        File file = new File(context.getFilesDir(), filename);
-
-        Log.e("TESTE", "Salvando arquivo...");
-        try (FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE)) {
-            fos.write(content.getBytes());
-        } catch (Exception e) {
-            Log.e("TESTE", "Erro fos");
-        }
-
-    }
-
-    private String listFiles() {
-        String[] files = this.context.fileList();
-
-        for (String f : files) {
-            Log.e("TESTE", f);
-        }
-        return String.join("\n", files);
-    }
-
-    private String readFile(String filename) {
-        FileInputStream fis = null;
-        String content = null;
-        try {
-            fis = context.openFileInput(filename);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-        InputStreamReader inputStreamReader =
-                new InputStreamReader(fis, StandardCharsets.UTF_8);
-        StringBuilder stringBuilder = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(inputStreamReader)) {
-            String line = reader.readLine();
-            while (line != null) {
-                stringBuilder.append(line).append('\n');
-                line = reader.readLine();
-            }
-        } catch (IOException e) {
-            return null;
-        } finally {
-            content = stringBuilder.toString();
-        }
-        return content;
-    }
-
-    private boolean isExternalStorageWritable() {
-        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-    }
-
-    private boolean isExternalStorageReadable() {
-        return Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED) ||
-                Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED_READ_ONLY);
-    }
-
-    private void createSharedFile() {
-        final int CREATE_FILE = 1;
-
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/pdf");
-        intent.putExtra(Intent.EXTRA_TITLE, "Aula02.pdf");
-
-        startActivityForResult(intent, CREATE_FILE);
-    }
-
-    private void openSharedFile() {
-        final int PICK_PDF_FILE = 2;
-
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType("application/pdf");
-
-        startActivityForResult(intent, PICK_PDF_FILE);
-    }
-
-    private void writeSharedPrefs(String key, String value) {
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("CONFIGS", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(key, value);
-        editor.apply();
-    }
-
-    private String readSharedPrefs(String key) {
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences("CONFIGS", Context.MODE_PRIVATE);
-        String value = sharedPref.getString(key, "valor padrão");
-        return value;
     }
 }
